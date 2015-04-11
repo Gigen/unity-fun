@@ -5,67 +5,82 @@ public class Chasis : MonoBehaviour {
 
 	[SerializeField] private float[] _Wheelbase;
 	[SerializeField] private float[] _Track; //Tracks front to back
-	private Vector3[] WheelPositions; //Tracks front to back
+
+
+	[SerializeField] private float _Width = 1000f;
+
+
+
+	private Vector3[] WheelPositions;
+	public Track[] Tracks;
+	public Suspension[] Suspensions;
 
 	float Wheelbase(int i) {
 		return _Wheelbase[i] * Helper.MmToUU;
-	
-	}float Track(int i) {
-		return _Track[i] * Helper.MmToUU;
 	}
 
+	public float Width {
+		get { return _Width * Helper.MmToUU; }
+	}
+
+	private float Track(int i) {
+		return _Track[i] * Helper.MmToUU; 
+	}
 	void Start () {
-		CalculateWheelPositions();
-
-		for (int i = 0; i < WheelPositions.Length; i++) {
-			GameObject wheel = new GameObject("Wheel");
-			wheel.transform.position = WheelPositions[i];
-			wheel.transform.localEulerAngles = new Vector3(270,0,0);
-			wheel.transform.parent = transform;
-			Wheel w = wheel.AddComponent<Wheel>();
-			if (i%2 == 1)
-				w.Mirror = true;
-		}
-	}
-	
-	// Update is called once per frame
-	bool CalculateWheelPositions() {
 		if(_Wheelbase.Length + 1 != _Track.Length){
 			Debug.LogError("WheelBase to Track ratio not correct");
-			return false;
+			return;
 		}
-		WheelPositions = new Vector3[(_Wheelbase.Length+1)*2];
-
+		CreateTracks();
+		CreateWheels();
+		//CreateSuspensionsMounts();
+		//CreateSuspensions();
+	}
+	void CreateTracks() {
+		Tracks = new Track[_Track.Length];
 		float totalWheelbaseLenght = 0;
 		for(int x = 0; x < _Wheelbase.Length; x++)
 			totalWheelbaseLenght += Wheelbase(x);
 		
 		float firstTrackPosition = totalWheelbaseLenght/2;
 
-		for (int t = 0; t < _Track.Length; t++) {
+		for (int i = 0; i < _Track.Length; i++) {
 			float trackPosition = firstTrackPosition;
-			for (int i = 0; i < t; i++)
-				trackPosition -= Wheelbase(i);
-
-			WheelPositions[t*2 + 0] = new Vector3(trackPosition, 0 , -Track(t)/2);
-			WheelPositions[t*2 + 1] = new Vector3(trackPosition, 0 , Track(t)/2);
+			for (int x = 0; x < i; x++)
+				trackPosition -= Wheelbase(x);
+			Track t = new GameObject("Track" + i).AddComponent<Track>();
+			t.transform.parent = transform;
+			t.transform.localPosition = new Vector3(trackPosition,0,0);
+			t.transform.localRotation = Quaternion.identity;
+			t.Width = Track(i);
+			t.Chasis = this;
+			t.Init();
+			Tracks[i] = t;
 		}
-		return true;
+	}
+	void CreateWheels() {
+		for(int t = 0; t < Tracks.Length; t++) {
+			Wheel wL = new GameObject("Wheel").AddComponent<Wheel>();
+			wL.Mirror = true;
+			wL.transform.parent = Tracks[t].LeftSuspension.WheelJoint;
+			wL.transform.localPosition = Vector3.zero;
+			wL.transform.localScale = Vector3.one;
+			wL.transform.localEulerAngles = new Vector3(270,0,0);
+			Wheel wR = new GameObject("Wheel").AddComponent<Wheel>();
+			wR.transform.parent = Tracks[t].RightSuspension.WheelJoint;
+			wR.transform.localPosition = Vector3.zero;
+			wR.transform.localScale = Vector3.one;
+			wR.transform.localEulerAngles = new Vector3(270,0,0);
+		}
 	}
 
-	void DrawDebug() {
-		float totalWheelbaseLenght = 0;
-		for(int x = 0; x < _Wheelbase.Length; x++)
-			totalWheelbaseLenght += Wheelbase(x);
-		Debug.DrawLine(new Vector3(totalWheelbaseLenght/2,0,0),new Vector3(-totalWheelbaseLenght/2,0,0),Color.blue);
 
-		for(int i = 0; i < WheelPositions.Length; i++) {
-			Debug.DrawLine(WheelPositions[i], new Vector3(WheelPositions[i].x,0,0));
-		}
+	void DrawDebug() {
+		for(int x = 0; x < Tracks.Length-1; x++)
+			Debug.DrawLine(Tracks[x].transform.position,Tracks[x+1].transform.position,Color.blue);
 	}
 
 	void Update () {
-		if (CalculateWheelPositions())
-			DrawDebug();
+		DrawDebug();
 	}
 }
