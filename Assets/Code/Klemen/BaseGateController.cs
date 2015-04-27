@@ -2,25 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 
-enum PinType {
-	Input = 0,
-	Output = 1
-};
+struct GateData {
+	float value;
+	BaseGateController gateScript;
+}
 
 public class BaseGateController : MonoBehaviour {
 
-	private Dictionary<string, float> inputs;
-	private Dictionary<string, float> outputs;
+	private Dictionary<string, GateData> inputs;
+	private Dictionary<string, GateData> outputs;
 
 	void Start () {
 		Time.fixedDeltaTime = 0.001f;
 	}
 
 	void addInput(string inputName) {
-		inputs.Add (inputName, 0);
+		inputs.Add (inputName, new GateData());
 	}
 
 	void addOutput(string outputName) {
-		outputs.Add (outputName, 0);
+		outputs.Add (outputName, new GateData());
 	}
 }
