@@ -29,6 +29,7 @@ public class Wheel : MonoBehaviour {
 	private GameObject RimArch;
 	private MeshFilter RimArchMeshFilter;
 	private MeshFilter RimCenterMeshFilter;
+	private MeshCollider WheelColldier;
 
 
 	void Start () {
@@ -193,9 +194,21 @@ public class Wheel : MonoBehaviour {
 		m.RecalculateNormals();
 	}
 
+	void UpdateWheelCollider() {
+		if (WheelColldier == null) {
+			Rigidbody r = gameObject.AddComponent<Rigidbody>();
+			WheelColldier = gameObject.AddComponent<MeshCollider>();
+			WheelColldier.sharedMesh = new Mesh();
+			WheelColldier.convex = true;
+		}
+		WheelColldier.convex = true;
+		MeshGenerator.Cylinder(WheelColldier.sharedMesh,16,TotalWheelRadius,TireWidth);
+	}
+
 	void Update () {
 		UpdateTireBezier();
 		UpdateTireMesh(TireMeshFilter.sharedMesh);
+		UpdateWheelCollider();
 		Tire.transform.localPosition = new Vector3(0,-RimEt,0);
 		RimArch.transform.localPosition = Tire.transform.localPosition;
 		MeshGenerator.Tube(RimArchMeshFilter.sharedMesh, NUM_CIRCULAR_DIVISIONS,RimRadius-20*Helper.MmToUU,RimRadius,RimWidth+5*Helper.MmToUU);

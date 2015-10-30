@@ -10,6 +10,7 @@ public class SuspensionMount {
 public class Suspension : MonoBehaviour {
 
 	// Use this for initialization
+	[SerializeField] private float _MinSuspensionLength = 275f;
 	[SerializeField] private float _SuspensionLength = 475f;
 	[SerializeField] private float _JointToWheelDistance = 205f;
 	
@@ -23,6 +24,10 @@ public class Suspension : MonoBehaviour {
 		get { return _JointToWheelDistance * Helper.MmToUU; }
 	}
 	
+	float MinSuspensionLength {
+		get { return _MinSuspensionLength * Helper.MmToUU; }
+	}
+
 	float SuspensionLength {
 		get { return _SuspensionLength * Helper.MmToUU; }
 	}
@@ -40,7 +45,7 @@ public class Suspension : MonoBehaviour {
 		WheelJoint = new GameObject("WheelJoint").transform;
 		WheelJoint.parent = ArmSpringJoint;
 		WheelJoint.localPosition = new Vector3(0,0,JointToWheelDistance*Mirror);
-		ArmSpringJoint.parent = transform;
+		ArmSpringJoint.parent = Track.Chasis.transform.parent;
 		UpdateSuspension();
 	}
 	private void UpdateSuspension() {
@@ -51,6 +56,7 @@ public class Suspension : MonoBehaviour {
 		                                          out i1, out i2)) {
 			return;
 		}
+
 		Vector3 intersect;
 		if (i1.x > i2.x) // pick lower intersection one
 			intersect = new Vector3(Track.transform.position.x,i2.x,i2.y);
@@ -67,7 +73,7 @@ public class Suspension : MonoBehaviour {
 	}
 	// Update is called once per frame
 	void Update () {
-		UpdateSuspension();
+		//UpdateSuspension();
 		DrawDebug();
 	}
 }

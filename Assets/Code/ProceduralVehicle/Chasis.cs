@@ -31,10 +31,22 @@ public class Chasis : MonoBehaviour {
 			Debug.LogError("WheelBase to Track ratio not correct");
 			return;
 		}
+
+		CreateCollider();
 		CreateTracks();
 		CreateWheels();
 		//CreateSuspensionsMounts();
 		//CreateSuspensions();
+	}
+
+	void CreateCollider() {
+		float totalWheelbaseLenght = 0;
+		for(int x = 0; x < _Wheelbase.Length; x++)
+			totalWheelbaseLenght += Wheelbase(x);
+
+		BoxCollider bc = gameObject.AddComponent<BoxCollider>();
+		bc.size = new Vector3(totalWheelbaseLenght,0.2f,Width);
+
 	}
 	void CreateTracks() {
 		Tracks = new Track[_Track.Length];
@@ -62,15 +74,26 @@ public class Chasis : MonoBehaviour {
 		for(int t = 0; t < Tracks.Length; t++) {
 			Wheel wL = new GameObject("Wheel").AddComponent<Wheel>();
 			wL.Mirror = true;
-			wL.transform.parent = Tracks[t].LeftSuspension.WheelJoint;
+			/*wL.transform.parent = Tracks[t].LeftSuspension.WheelJoint;
 			wL.transform.localPosition = Vector3.zero;
 			wL.transform.localScale = Vector3.one;
+			wL.transform.localEulerAngles = new Vector3(270,0,0);*/
+			wL.transform.parent = transform.parent;
+			wL.transform.localPosition = Tracks[t].LeftSuspension.WheelJoint.position;
+			wL.transform.localScale = Vector3.one;
 			wL.transform.localEulerAngles = new Vector3(270,0,0);
+
+
 			Wheel wR = new GameObject("Wheel").AddComponent<Wheel>();
-			wR.transform.parent = Tracks[t].RightSuspension.WheelJoint;
+			/*wR.transform.parent = Tracks[t].RightSuspension.WheelJoint;
 			wR.transform.localPosition = Vector3.zero;
 			wR.transform.localScale = Vector3.one;
+			wR.transform.localEulerAngles = new Vector3(270,0,0);*/
+			wR.transform.parent = transform.parent;
+			wR.transform.localPosition = Tracks[t].RightSuspension.WheelJoint.position;
+			wR.transform.localScale = Vector3.one;
 			wR.transform.localEulerAngles = new Vector3(270,0,0);
+
 		}
 	}
 
