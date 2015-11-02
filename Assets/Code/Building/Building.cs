@@ -6,7 +6,7 @@ public abstract class Building : MonoBehaviour {
 	public float health = 100;
 	public float maxHealth = 100;
 
-	public void Init () {
+	public void Awake () {
 		health = maxHealth;
 		OnInit();
 	}
