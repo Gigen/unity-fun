@@ -6,16 +6,12 @@ public class Pump : Building {
 	public bool CanPump = true;
 	[SerializeField] private Resource Resource;
 	[SerializeField] private Animator PumpAnimator;
-	private StorageSpace StorageSpace;
+	public StorageSpace StorageSpace;
     private float pumpedAmount;
     private bool WaitingForFlush = false;
     private bool Pumping = false;
 
 	public override void OnInit() {
-        //create storage space
-        StorageSpace = gameObject.AddComponent<StorageSpace>();
-		StorageSpace.Capacity = 5f;
-		StorageSpace.maxInputs = 0;
         Pumping = true;
 	}
 

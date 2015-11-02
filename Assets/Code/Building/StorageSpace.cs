@@ -29,6 +29,102 @@ public class StorageSpace : MonoBehaviour {
 	public float maxOutputs = 1;
 	public float inputSpeed = 1;
 	public float outputSpeed = 1;
-	public List<Building> BuildingInput = new List<Building>();
-	public List<Building> BuildingOutput = new List<Building>();
+	public List<StorageSpace> Inputs = new List<StorageSpace>();
+	public List<StorageSpace> Outputs = new List<StorageSpace>();
+    public Transform VisualRepresentationTransform;
+    
+
+    public float Fullness
+    {
+        get { return Mathf.Clamp01(Stored / Capacity); }
+    }
+
+    public float FreeStorage
+    {
+        get { return Capacity-Stored; }
+    }
+
+    public void Fill(float amount)
+    {
+        Stored += amount;
+        if (Stored > Capacity)
+            Debug.LogError("Stored more than capacity!");
+    }
+    public void Remove(float amount)
+    {
+        Stored -= amount;
+        if (Stored < 0)
+            Debug.LogError("Negative Stored value!");
+    }
+
+    static void Transfer(StorageSpace output, StorageSpace input, float amount)
+    {
+        output.Remove(amount);
+        input.Fill(amount);
+    }
+
+    public void Update()
+    {
+        ManageOutputs();
+        VisualRepresentation();
+    }
+    public void VisualRepresentation()
+    {
+        if (VisualRepresentationTransform == null)
+            return;
+        VisualRepresentationTransform.localScale = new Vector3(1, Fullness, 1);
+
+    }
+
+    public void ManageOutputs()
+    {
+        if (Stored <= 0)
+            return;
+        List<StorageSpace> emptierOutputs = new List<StorageSpace>(Outputs.Count);
+        foreach (StorageSpace output in Outputs)
+        {
+            if (output.Fullness < Fullness)
+                emptierOutputs.Add(output);
+        }
+        if (emptierOutputs.Count > 0)
+        {
+            float outputRate = outputSpeed / emptierOutputs.Count;
+            float packetSize = outputRate * Time.deltaTime;
+            if ((packetSize * emptierOutputs.Count) > Stored)
+                packetSize = Stored / emptierOutputs.Count;
+            foreach (StorageSpace output in emptierOutputs)
+            {
+                if (FreeStorage < packetSize)
+                {
+                    Transfer(this, output, output.FreeStorage);
+                    //TODO Adjust packet size for next
+                } else
+                {
+                    Transfer(this, output, packetSize);
+                }
+            }
+        }
+    }
+   /* def manageOutputs(self, t):
+        fullness = self.stored/self.storageSpace
+		if self.stored>0:
+			goodOutputs = []
+			#compare with yourself
+			for o in self.output:
+				outputFullness = o.stored/o.storageSpace
+				if outputFullness<fullness:
+                    goodOutputs.append(o)
+			if len(goodOutputs) > 0:
+				eachOutputRate = self.outputSpeed/len(goodOutputs)
+                sendSize = eachOutputRate* t
+				if sendSize* len(goodOutputs) > self.stored:
+					sendSize = self.stored/len(goodOutputs)
+				for o in goodOutputs:
+					if o.storageSpace - o.stored<sendSize:
+                        dif = o.storageSpace - o.stored
+                        self.stored-=dif
+                        o.stored+=dif
+					else:
+                        self.stored-=sendSize
+                        o.stored+=sendSize*/
 }
