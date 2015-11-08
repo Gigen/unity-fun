@@ -68,6 +68,7 @@ public class StorageSpace : MonoBehaviour {
         ManageOutputs();
         VisualRepresentation();
     }
+
     public void VisualRepresentation()
     {
         if (VisualRepresentationTransform == null)
@@ -105,26 +106,26 @@ public class StorageSpace : MonoBehaviour {
             }
         }
     }
-   /* def manageOutputs(self, t):
-        fullness = self.stored/self.storageSpace
-		if self.stored>0:
-			goodOutputs = []
-			#compare with yourself
-			for o in self.output:
-				outputFullness = o.stored/o.storageSpace
-				if outputFullness<fullness:
-                    goodOutputs.append(o)
-			if len(goodOutputs) > 0:
-				eachOutputRate = self.outputSpeed/len(goodOutputs)
-                sendSize = eachOutputRate* t
-				if sendSize* len(goodOutputs) > self.stored:
-					sendSize = self.stored/len(goodOutputs)
-				for o in goodOutputs:
-					if o.storageSpace - o.stored<sendSize:
-                        dif = o.storageSpace - o.stored
-                        self.stored-=dif
-                        o.stored+=dif
-					else:
-                        self.stored-=sendSize
-                        o.stored+=sendSize*/
+
+    public static bool Connect(Building output, Building input)
+    {
+        StorageSpace outputStorageSpace = output.GetStorageSpace();
+        StorageSpace inputStorageSpace = input.GetStorageSpace();
+        if (outputStorageSpace && inputStorageSpace)
+        {
+            return Connect(outputStorageSpace, inputStorageSpace);
+        }
+        return false;
+    }
+
+    public static bool Connect(StorageSpace output, StorageSpace input)
+    {
+        if (output.Outputs.Count >= output.maxOutputs)
+            return false;
+        if (input.Inputs.Count >= input.maxInputs)
+            return false;
+        output.Outputs.Add(input);
+        input.Inputs.Add(output);
+        return false;
+    }
 }

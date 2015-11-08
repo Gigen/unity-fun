@@ -54,4 +54,6 @@ public class Pump : Building {
         pumpedAmount = 0;
         Pumping = true;
     }
+
+    public override StorageSpace GetStorageSpace() { return StorageSpace; }
 }
