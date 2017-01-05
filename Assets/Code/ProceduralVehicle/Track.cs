@@ -9,8 +9,10 @@ public class Track : MonoBehaviour {
 	public SuspensionMount RightSuspensionMount;
 	public Suspension LeftSuspension;
 	public Suspension RightSuspension;
+    private Wheel LeftWheel;
+    private Wheel RightWheel;
 
-	public Chasis Chasis;
+    public Chasis Chasis;
 
 	public float Width {
 		get { return _Width * Helper.MmToUU; }
@@ -25,7 +27,9 @@ public class Track : MonoBehaviour {
 	public void Init () {
 		CreateSuspensionsMounts();
 		CreateSuspensions();
-	}
+        CreateWheels();
+        ConnectWheels();
+    }
 
 	void CreateSuspensionsMounts() {
 		RightSuspensionMount = new SuspensionMount();
@@ -74,7 +78,54 @@ public class Track : MonoBehaviour {
 		RightSuspension.Init();
 	}
 
-	public void DrawDebug() {
+    void CreateWheels()
+    {
+        LeftWheel = new GameObject("Wheel").AddComponent<Wheel>();
+        LeftWheel.Mirror = true;
+        LeftWheel.transform.parent = transform.parent;
+        LeftWheel.transform.position = LeftSuspension.WheelJoint.position;
+        LeftWheel.transform.localScale = Vector3.one;
+        LeftWheel.transform.localEulerAngles = new Vector3(270, 0, 0);
+
+        RightWheel = new GameObject("Wheel").AddComponent<Wheel>();
+        RightWheel.transform.parent = transform.parent;
+        RightWheel.transform.position = RightSuspension.WheelJoint.position;
+        RightWheel.transform.localScale = Vector3.one;
+        RightWheel.transform.localEulerAngles = new Vector3(270, 0, 0);
+    }
+
+    public void ConnectWheels()
+    {
+        //SpringJoint LeftSpring = LeftWheel.gameObject.AddComponent<SpringJoint>();
+        HingeJoint LeftHinge = Chasis.gameObject.AddComponent<HingeJoint>();
+        LeftHinge.connectedBody = LeftWheel.Rigidbody;
+        LeftHinge.anchor = new Vector3(transform.position.x, 0, LeftSuspensionMount.LowerSuspensionMount.transform.position.z);
+        LeftHinge.axis = new Vector3(1, 0, 0);
+
+        HingeJoint RightHinge = Chasis.gameObject.AddComponent<HingeJoint>();
+        RightHinge.connectedBody = RightWheel.Rigidbody;
+        RightHinge.anchor = new Vector3(transform.position.x, 0, RightSuspensionMount.LowerSuspensionMount.transform.position.z);
+        RightHinge.axis = new Vector3(1, 0, 0);
+
+        SpringJoint LeftSpring = LeftWheel.gameObject.AddComponent<SpringJoint>();
+        LeftSpring.connectedBody = Chasis.Rigidbody;
+        LeftSpring.anchor = Vector3.zero;
+        LeftSpring.autoConfigureConnectedAnchor = false;
+        LeftSpring.connectedAnchor = new Vector3(transform.position.x, LeftSuspensionMount.UpperSuspensionMount.transform.localPosition.y, LeftSuspensionMount.UpperSuspensionMount.transform.localPosition.z);
+        LeftSpring.minDistance = Vector3.Distance(LeftSuspensionMount.UpperSuspensionMount.transform.position, LeftWheel.transform.position);
+        LeftSpring.maxDistance = LeftSpring.minDistance;
+        LeftSpring.spring = 161255f;
+
+        SpringJoint RightSpring = RightWheel.gameObject.AddComponent<SpringJoint>();
+        RightSpring.connectedBody = Chasis.Rigidbody;
+        RightSpring.anchor = Vector3.zero;
+        RightSpring.autoConfigureConnectedAnchor = false;
+        RightSpring.connectedAnchor = new Vector3(transform.position.x, RightSuspensionMount.UpperSuspensionMount.transform.localPosition.y, RightSuspensionMount.UpperSuspensionMount.transform.localPosition.z);
+        RightSpring.minDistance = Vector3.Distance(RightSuspensionMount.UpperSuspensionMount.transform.position, RightWheel.transform.position);
+        RightSpring.maxDistance = RightSpring.minDistance;
+        RightSpring.spring = 161255f;
+    }
+    public void DrawDebug() {
 		Debug.DrawLine(LeftSuspensionMount.LowerSuspensionMount.position, RightSuspensionMount.LowerSuspensionMount.position,Color.gray);
 		Debug.DrawLine(LeftSuspensionMount.LowerSuspensionMount.position, LeftSuspensionMount.UpperSuspensionMount.position,Color.yellow);
 		Debug.DrawLine(RightSuspensionMount.LowerSuspensionMount.position, RightSuspensionMount.UpperSuspensionMount.position,Color.yellow);

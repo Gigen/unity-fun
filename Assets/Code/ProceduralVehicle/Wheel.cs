@@ -15,8 +15,9 @@ public class Wheel : MonoBehaviour {
 	[SerializeField] private float _RimWidth = 7.5f; //inch
 	[SerializeField] private float _RimEt = 55f; //mm
 
+    public Rigidbody Rigidbody;
 	public bool Mirror = false;
-
+    
 
 	[SerializeField] private int divisions = 15;
 
@@ -32,10 +33,11 @@ public class Wheel : MonoBehaviour {
 	private MeshCollider WheelColldier;
 
 
-	void Start () {
+	void Awake () {
 		UpdateTireBezier();
 		CreateWheel();
-	}
+        UpdateWheelCollider();
+    }
 
 	public float TireWidth
 	{
@@ -196,7 +198,8 @@ public class Wheel : MonoBehaviour {
 
 	void UpdateWheelCollider() {
 		if (WheelColldier == null) {
-			Rigidbody r = gameObject.AddComponent<Rigidbody>();
+			Rigidbody = gameObject.AddComponent<Rigidbody>();
+            Rigidbody.mass = 20f;
 			WheelColldier = gameObject.AddComponent<MeshCollider>();
 			WheelColldier.sharedMesh = new Mesh();
 			WheelColldier.convex = true;
@@ -213,4 +216,12 @@ public class Wheel : MonoBehaviour {
 		RimArch.transform.localPosition = Tire.transform.localPosition;
 		MeshGenerator.Tube(RimArchMeshFilter.sharedMesh, NUM_CIRCULAR_DIVISIONS,RimRadius-20*Helper.MmToUU,RimRadius,RimWidth+5*Helper.MmToUU);
 	}
+
+    void FixedUpdate()
+    {
+        if (Input.GetKey(KeyCode.UpArrow)) { 
+        Rigidbody.AddTorque(new Vector3(0, 0, 1000000000f));
+        Rigidbody.AddForce(new Vector3(100f, 0, 0));
+        }
+    }
 }

@@ -10,9 +10,9 @@ public class SuspensionMount {
 public class Suspension : MonoBehaviour {
 
 	// Use this for initialization
-	[SerializeField] private float _MinSuspensionLength = 275f;
-	[SerializeField] private float _SuspensionLength = 475f;
-	[SerializeField] private float _JointToWheelDistance = 205f;
+	[SerializeField] private float _MinSuspensionLength = 375f;
+	[SerializeField] private float _SuspensionLength = 600f;
+	[SerializeField] private float _JointToWheelDistance = 200f;
 	
 	public Track Track;
 	public SuspensionMount SuspensionMount;

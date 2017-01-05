@@ -5,13 +5,11 @@ public class Chasis : MonoBehaviour {
 
 	[SerializeField] private float[] _Wheelbase;
 	[SerializeField] private float[] _Track; //Tracks front to back
-
-
+    
 	[SerializeField] private float _Width = 1000f;
 
-
-
-	private Vector3[] WheelPositions;
+    public Rigidbody Rigidbody;
+    private Vector3[] WheelPositions;
 	public Track[] Tracks;
 	public Suspension[] Suspensions;
 
@@ -34,9 +32,6 @@ public class Chasis : MonoBehaviour {
 
 		CreateCollider();
 		CreateTracks();
-		CreateWheels();
-		//CreateSuspensionsMounts();
-		//CreateSuspensions();
 	}
 
 	void CreateCollider() {
@@ -68,32 +63,6 @@ public class Chasis : MonoBehaviour {
 			t.Chasis = this;
 			t.Init();
 			Tracks[i] = t;
-		}
-	}
-	void CreateWheels() {
-		for(int t = 0; t < Tracks.Length; t++) {
-			Wheel wL = new GameObject("Wheel").AddComponent<Wheel>();
-			wL.Mirror = true;
-			/*wL.transform.parent = Tracks[t].LeftSuspension.WheelJoint;
-			wL.transform.localPosition = Vector3.zero;
-			wL.transform.localScale = Vector3.one;
-			wL.transform.localEulerAngles = new Vector3(270,0,0);*/
-			wL.transform.parent = transform.parent;
-			wL.transform.localPosition = Tracks[t].LeftSuspension.WheelJoint.position;
-			wL.transform.localScale = Vector3.one;
-			wL.transform.localEulerAngles = new Vector3(270,0,0);
-
-
-			Wheel wR = new GameObject("Wheel").AddComponent<Wheel>();
-			/*wR.transform.parent = Tracks[t].RightSuspension.WheelJoint;
-			wR.transform.localPosition = Vector3.zero;
-			wR.transform.localScale = Vector3.one;
-			wR.transform.localEulerAngles = new Vector3(270,0,0);*/
-			wR.transform.parent = transform.parent;
-			wR.transform.localPosition = Tracks[t].RightSuspension.WheelJoint.position;
-			wR.transform.localScale = Vector3.one;
-			wR.transform.localEulerAngles = new Vector3(270,0,0);
-
 		}
 	}
 
